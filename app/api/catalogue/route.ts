@@ -1,6 +1,7 @@
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getCatalogue, setCatalogue, isStoreConfigured } from "@/lib/catalogue-store";
-import { deleteOtherVersions, isImageStoreConfigured } from "@/lib/page-image-store";
+import { deleteVersionsExcept, isImageStoreConfigured } from "@/lib/page-image-store";
 import { rejectUnlessAdmin } from "@/lib/admin-auth";
 import { extractDriveFileId } from "@/lib/drive-link";
 import {
@@ -104,12 +105,16 @@ export async function POST(request: NextRequest) {
     rendition = parsed;
   }
 
+  const previous = await getCatalogue().catch(() => null);
   const state: CatalogueState = { driveFileId: fileId, updatedAt: new Date().toISOString(), rendition };
   await setCatalogue(state);
+  revalidatePath("/catalogue");
 
   if (rendition && isImageStoreConfigured()) {
-    // the new catalogue is already live, so a failed cleanup only leaves unused images behind
-    await deleteOtherVersions(rendition.version).catch((err) =>
+    // the previous version survives one more publish: a visitor can still be served the cached
+    // page (or have it open) while it regenerates. A failed cleanup only leaves unused images behind.
+    const keep = [rendition.version, previous?.rendition?.version].filter((v): v is string => !!v);
+    await deleteVersionsExcept(keep).catch((err) =>
       console.error("Couldn't delete old catalogue images", err)
     );
   }

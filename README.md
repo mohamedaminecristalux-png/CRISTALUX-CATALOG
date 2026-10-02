@@ -49,6 +49,12 @@ password + Google Drive link form.
   opening spread is preloaded with the HTML and the next few pages are fetched
   as they flip. No PDF download, no in-browser rendering — the book shows in
   about a second.
+- `/catalogue` itself is a static page served from Vercel's edge cache, so a
+  visit never waits on a function cold start; publishing calls
+  `revalidatePath("/catalogue")` to rebuild it. The previous version's images
+  are kept until the next publish, for visitors still on the old page.
+- Functions run in Paris (`cdg1`, set in `vercel.json`), close to the
+  Tunisian audience — create the Redis database in a European region too.
 - Catalogues published before pre-rendering existed (or with no Blob store
   connected) still work through the old path — the browser downloads and
   renders the whole PDF — which is slow. **Republish once** to switch over.

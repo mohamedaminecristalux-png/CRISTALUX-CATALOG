@@ -12,8 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/catalogue" },
 };
 
-// the published catalogue can change at any moment, so this is rendered per request
-export const dynamic = "force-dynamic";
+// Rendered once and served from Vercel's edge cache, so visitors never wait on a
+// function cold start. Publishing calls revalidatePath("/catalogue") to rebuild it.
+// force-static also keeps the Redis client's `no-store` fetch from making it dynamic.
+export const dynamic = "force-static";
 
 export default async function CataloguePage() {
   const catalogue = await getCatalogue().catch(() => null);

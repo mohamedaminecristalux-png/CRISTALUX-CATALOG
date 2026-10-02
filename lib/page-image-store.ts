@@ -67,15 +67,16 @@ export async function readLocalPageImage(
   }
 }
 
-/** Deletes the images of every other version (previous catalogues and abandoned publishes). */
-export async function deleteOtherVersions(keepVersion: string): Promise<void> {
+/** Deletes the images of every version not in `keepVersions` (old catalogues and abandoned publishes). */
+export async function deleteVersionsExcept(keepVersions: string[]): Promise<void> {
   if (hasBlob()) {
     const stale: string[] = [];
     let cursor: string | undefined;
     do {
       const page = await list({ prefix: BLOB_PREFIX, cursor });
       for (const blob of page.blobs) {
-        if (!blob.pathname.startsWith(`${BLOB_PREFIX}${keepVersion}/`)) stale.push(blob.url);
+        const version = blob.pathname.slice(BLOB_PREFIX.length).split("/")[0];
+        if (!keepVersions.includes(version)) stale.push(blob.url);
       }
       cursor = page.hasMore ? page.cursor : undefined;
     } while (cursor);
@@ -86,7 +87,7 @@ export async function deleteOtherVersions(keepVersion: string): Promise<void> {
     const versions = await readdir(LOCAL_DIR).catch(() => [] as string[]);
     await Promise.all(
       versions
-        .filter((v) => v !== keepVersion)
+        .filter((v) => !keepVersions.includes(v))
         .map((v) => rm(path.join(LOCAL_DIR, v), { recursive: true, force: true }))
     );
   }
