@@ -8,8 +8,16 @@ export type { CatalogueState };
 const CATALOGUE_KEY = "cristalux:catalogue";
 const LOCAL_FILE = path.join(process.cwd(), ".data", "catalogue.json");
 
+/**
+ * Same names `Redis.fromEnv()` accepts: Upstash's own, or the `KV_*` ones the
+ * Vercel Marketplace integration injects by default (inherited from Vercel KV).
+ */
 function hasRedis(): boolean {
-  return Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+  const env = process.env;
+  return Boolean(
+    (env.UPSTASH_REDIS_REST_URL || env.KV_REST_API_URL) &&
+      (env.UPSTASH_REDIS_REST_TOKEN || env.KV_REST_API_TOKEN)
+  );
 }
 
 /**

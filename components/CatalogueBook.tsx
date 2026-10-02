@@ -220,7 +220,11 @@ export default function CatalogueBook({
         </div>
       )}
 
-      <CatalogueAdmin imageStoreConfigured={imageStoreConfigured} onPublished={setCatalogue} />
+      <CatalogueAdmin
+        storeConfigured={storeConfigured}
+        imageStoreConfigured={imageStoreConfigured}
+        onPublished={setCatalogue}
+      />
     </div>
   );
 }

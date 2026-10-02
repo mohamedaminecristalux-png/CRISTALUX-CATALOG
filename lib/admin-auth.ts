@@ -9,16 +9,26 @@ function passwordMatches(input: string, expected: string): boolean {
   return timingSafeEqual(a, b);
 }
 
+/**
+ * Unlike a .env file, the Vercel dashboard stores a value verbatim, so a pasted
+ * `"secret"` keeps its quotes and a copied line can carry a trailing newline.
+ */
+function configuredPassword(): string {
+  const raw = (process.env.CATALOGUE_ADMIN_PASSWORD ?? "").trim();
+  const quoted = raw.length >= 2 && (raw[0] === '"' || raw[0] === "'") && raw.at(-1) === raw[0];
+  return quoted ? raw.slice(1, -1).trim() : raw;
+}
+
 /** Returns the error response to send back if `password` isn't the admin password, otherwise null. */
 export function rejectUnlessAdmin(password: string | null | undefined): NextResponse | null {
-  const adminPassword = process.env.CATALOGUE_ADMIN_PASSWORD;
+  const adminPassword = configuredPassword();
   if (!adminPassword) {
     return NextResponse.json(
       { error: "The catalogue admin password isn't configured on the server yet." },
       { status: 500 }
     );
   }
-  if (!password || !passwordMatches(password, adminPassword)) {
+  if (!password || !passwordMatches(password.trim(), adminPassword)) {
     return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
   }
   return null;

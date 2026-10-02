@@ -87,9 +87,11 @@ async function renderAndUpload(
 }
 
 export default function CatalogueAdmin({
+  storeConfigured,
   imageStoreConfigured,
   onPublished,
 }: {
+  storeConfigured: boolean;
   imageStoreConfigured: boolean;
   onPublished: (catalogue: CatalogueState) => void;
 }) {
@@ -102,6 +104,14 @@ export default function CatalogueAdmin({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // fail before the minute-long render and upload rather than at the final save
+    if (!storeConfigured) {
+      setMessage({
+        kind: "error",
+        text: "Storage isn't configured on this deployment yet. Connect an Upstash Redis store in Vercel, then redeploy.",
+      });
+      return;
+    }
     const fileId = extractDriveFileId(driveLink);
     if (!fileId) {
       setMessage({ kind: "error", text: "Couldn't find a file ID in that Google Drive link." });

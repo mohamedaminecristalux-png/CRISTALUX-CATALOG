@@ -79,7 +79,10 @@ export async function POST(request: NextRequest) {
 
   if (!isStoreConfigured()) {
     return NextResponse.json(
-      { error: "Storage isn't configured on the server yet (Upstash Redis env vars missing)." },
+      {
+        error:
+          "Storage isn't configured on the server yet (Upstash Redis env vars missing: KV_REST_API_URL/KV_REST_API_TOKEN or UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN).",
+      },
       { status: 500 }
     );
   }

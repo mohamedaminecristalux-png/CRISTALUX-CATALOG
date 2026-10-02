@@ -65,9 +65,10 @@ so the whole flow works out of the box with `npm run dev`. Don't point a local
 local publish would store page URLs that only exist on your machine.
 
 **Production setup on Vercel (three things, one time only):**
-1. **Storage** — in the Vercel dashboard: *Storage → Create Database → Redis*
-   (Upstash). Connect it to this project; Vercel injects
-   `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` automatically. This is
+1. **Storage** — in the Vercel dashboard: *Storage → Create Database →
+   Upstash for Redis*. Connect it to this project (Production checked, no
+   custom prefix); Vercel injects `KV_REST_API_URL` / `KV_REST_API_TOKEN`
+   automatically (`UPSTASH_REDIS_REST_URL` / `_TOKEN` also work). This is
    required in production — Vercel's serverless filesystem is read-only and
    ephemeral, so the local-file fallback only works for `next dev`.
 2. **Page images** — *Storage → Create → Blob*, connected to this project;
