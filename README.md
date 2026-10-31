@@ -81,8 +81,11 @@ local publish would store page URLs that only exist on your machine.
    automatically (`UPSTASH_REDIS_REST_URL` / `_TOKEN` also work). This is
    required in production — Vercel's serverless filesystem is read-only and
    ephemeral, so the local-file fallback only works for `next dev`.
-2. **Page images** — *Storage → Create → Blob*, connected to this project;
-   Vercel injects `BLOB_READ_WRITE_TOKEN`. Without it the catalogue still
+2. **Page images** — *Storage → Create → Blob* with **Public** access (a
+   store's access can't be changed later, and a private store's URLs can't be
+   loaded by visitors' browsers), connected to this project; Vercel injects
+   `BLOB_READ_WRITE_TOKEN` or, for newer stores, `BLOB_STORE_ID` (used with
+   the deployment's OIDC token) — either works. Without it the catalogue still
    publishes, but every visitor has to download and render the full PDF.
 3. **Admin password** — set `CATALOGUE_ADMIN_PASSWORD` under
    **Project Settings → Environment Variables** to whatever passphrase you want

@@ -38,8 +38,15 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Page image is empty or too large." }, { status: 413 });
   }
 
-  const url = await savePageImage(version, Number(page), contentType, body);
-  return NextResponse.json({ url });
+  try {
+    const url = await savePageImage(version, Number(page), contentType, body);
+    return NextResponse.json({ url });
+  } catch (err) {
+    // surfaces storage misconfiguration (e.g. a private Blob store) to the admin instead of a bare 500
+    console.error("Couldn't save catalogue page", err);
+    const reason = err instanceof Error ? err.message : "unknown error";
+    return NextResponse.json({ error: `Couldn't store page ${Number(page) + 1}: ${reason}` }, { status: 500 });
+  }
 }
 
 /** Serves page images saved to disk under `next dev` (in production they're served by Vercel Blob). */

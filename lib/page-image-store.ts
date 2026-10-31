@@ -12,8 +12,12 @@ export const PAGE_CONTENT_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
 };
 
+/**
+ * Older stores inject a static `BLOB_READ_WRITE_TOKEN`; newer ones only inject `BLOB_STORE_ID`
+ * and authenticate with the deployment's OIDC token. The SDK accepts either.
+ */
 function hasBlob(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
 }
 
 /** Same reasoning as the catalogue store: a local folder only works under `next dev`, never on Vercel. */
