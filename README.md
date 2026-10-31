@@ -45,10 +45,14 @@ password + Google Drive link form.
   `PUT /api/catalogue/pages/[version]/[page]` to Vercel Blob. Finally
   `POST /api/catalogue` stores the page list in Redis and deletes the previous
   catalogue's images. A 35 MB / 74-page PDF takes about a minute, once.
-- Visitors (`components/CatalogueBook.tsx`) only load those images: the
-  opening spread is preloaded with the HTML and the next few pages are fetched
-  as they flip. No PDF download, no in-browser rendering — the book shows in
-  about a second.
+- Visitors (`components/CatalogueBook.tsx`) only load those images, lazily:
+  the opening spread is part of the HTML itself (plain `<img>`s, swapped for
+  the flipbook once `page-flip` has loaded, with no layout shift), the pages
+  around the open spread load next, and once the book is open the rest
+  download in the background at low priority (skipped with Data Saver on), so
+  any page opens instantly. No PDF download, no in-browser rendering.
+- Navigation: Prev/Next, first/last page (« »), the ← → keys, and a page
+  number box — type a number and press Enter to jump straight there.
 - `/catalogue` itself is a static page served from Vercel's edge cache, so a
   visit never waits on a function cold start; publishing calls
   `revalidatePath("/catalogue")` to rebuild it. The previous version's images

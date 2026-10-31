@@ -40,8 +40,11 @@ declare module "page-flip" {
     turnToPrevPage(): void;
     flipNext(corner?: "top" | "bottom"): void;
     flipPrev(corner?: "top" | "bottom"): void;
+    flip(page: number, corner?: "top" | "bottom"): void;
     getPageCount(): number;
     getCurrentPageIndex(): number;
+    getOrientation(): "portrait" | "landscape";
+    getState(): "user_fold" | "fold_corner" | "flipping" | "read";
     destroy(): void;
   }
 }

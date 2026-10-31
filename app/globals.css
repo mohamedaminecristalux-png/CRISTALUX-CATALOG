@@ -124,6 +124,36 @@ body {
   height: 100%;
 }
 
+/* The opening spread shown with the HTML until page-flip has loaded, laid out exactly as
+   page-flip will lay it out: one page in a box under 560px (two 280px minWidth pages), two above. */
+.catalogue-preview {
+  container-type: inline-size;
+  width: 100%;
+}
+.catalogue-preview__spread {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 100%;
+  aspect-ratio: var(--page-ratio);
+}
+.catalogue-preview__spread img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.catalogue-preview__spread img + img {
+  display: none;
+}
+@container (min-width: 560px) {
+  .catalogue-preview__spread {
+    grid-template-columns: 1fr 1fr;
+    aspect-ratio: var(--spread-ratio);
+  }
+  .catalogue-preview__spread img + img {
+    display: block;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
